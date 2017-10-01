@@ -41,7 +41,7 @@ FROM
     trips
 GROUP by start_station
 
-3. The shortest trip duration is 100 (not sure what the unit of measurement is--perhaps seconds). The problem with the query below is that it returned only one row, while in fact, many trips had a duration of 100. 
+3. The shortest trip duration is 60 seconds. The problem with the query below is that it returned only one row, while in fact, many trips had a duration of 60 seconds. If we wanted to know all of them, we'd need to modify the query. If we only care about the shortest duration, then we could omit any reference to trip_id.
 
 SELECT
     trip_id,
@@ -50,7 +50,7 @@ FROM
     trips
     
 Returns:
-"921019"	"100"
+"1011650"	"60"
 
 4. The average trip duration, aggregated by end station, ranges from 257 to 4710.9. (There are 80 stations, so the complete results are not reproduced here.)
 
