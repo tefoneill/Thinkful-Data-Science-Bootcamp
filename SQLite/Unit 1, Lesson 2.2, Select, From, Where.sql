@@ -32,5 +32,5 @@ SELECT
 FROM
 		weather
 WHERE
-		ZIP like '94301' AND
-		Events like 'rain'
+		ZIP = '94301' AND
+		Events like '%Rain%'
