@@ -69,28 +69,34 @@ WITH
 	rainy
 AS (
 SELECT
-	weather.date,
+	weather.Date,
 	weather.Events
 FROM
-	trips
+	weather
 WHERE 
 	weather.Events like "%Rain%"
-Group by weather.date
+Group by weather.Date
 ),
-	third_longest
+third_longest
 AS(
 SELECT 
 	trips.duration,
 	trips.trip_id,
-	SUBTR(trips.start_date, 1, 10)
+	SUBSTR(trips.start_date, 1, 10) as trip_date
 FROM
 	trips
-GROUP BY start_date
+GROUP BY trip_date
 ORDER BY duration DESC
-LIMIT 1
-OFFSET  2 
+LIMIT -1 OFFSET 3
 )
-JOIN
-    rainy
+SELECT
+	rainy.Date,
+	rainy.Events,
+	third_longest.trip_id,
+	third_longest.trip_date,
+	third_longest.duration
+FROM 
+	rainy
+JOIN third_longest
 ON
-    rainy.date = trips.start_date
+    rainy.Date = third_longest.trip_date
