@@ -6,7 +6,11 @@
 -- 4. (Challenge) What's the third longest trip for each day it rains anywhere?
 
 
--- 1. I'm going to interpret this question as, "What are the three longest trips out of all the trips that took place on rainy days?" To complete this query, I need to join the tables on date (extracting a substring from the start_date series), where the Events column contains "Rain", and take the three longest durations in the resulting table. By trip ID, the three longest rainy-day trips are: 1210487, 1244903, 1011634.
+-- 1. I'm going to interpret this question as, "What are the three longest trips out of all the trips 
+-- that took place on rainy days?" To complete this query, I need to join the tables on date 
+-- (extracting a substring from the start_date series), where the Events column contains "Rain", 
+-- and take the three longest durations in the resulting table. By trip ID, the three longest rainy-day trips are: 
+-- 1210487, 1244903, 1011634.
 
 SELECT
 	trips.duration,
@@ -31,10 +35,12 @@ LIMIT 3
 --"81687"	"1244903"	"94301"	"Rain"	"94301"
 --"81484"	"1011634"	"94063"	"Rain"	"94063"
 
---2. The status table records the hourly status of each station, noting how many bikes are available, and how many docks are available. The query below creates an 'empty' case where there are no bikes available, then counts how often 'empty' occurs, grouped by station id. The three most frequently empty stations are stations 62, 45, and 63.
+--2. The status table records the hourly status of each station, noting how many bikes are available, 
+-- and how many docks are available. The query below creates an 'empty' case where there are no bikes available, 
+-- then counts how often 'empty' occurs, grouped by station id. The three most frequently empty stations are 
+-- stations 62, 45, and 63.
 
 SELECT
-	bikes_available,
 	COUNT(*) as empty_freq,
 	station_id
 FROM status
@@ -47,7 +53,11 @@ LIMIT 3
 --"empty"	"15318"	"45"
 --"empty"	"13927"	"63"
 
---3. The query below returns the number of trips that started at each station, ordered by the number of docks at each station. Although there are 67 stations in the stations table, the join returns only 63 rows. There may be an issue with the query, or perhaps trips were not started at 4 of the stations. If there is a problem with the query, then maybe an intermediate join with a table recording counts of start_station needs to be used.
+--3. The query below returns the number of trips that started at each station, ordered by the number of docks at each station. 
+-- Although there are 67 stations in the stations table, the join returns only 63 rows. 
+-- There may be an issue with the query, or perhaps trips were not started at 4 of the stations. 
+-- If there is a problem with the query, then maybe an intermediate join with a table recording counts of start_station 
+-- needs to be used.
 
 SELECT
 	trips.start_station,
@@ -63,7 +73,9 @@ ON
 GROUP BY stations.name
 ORDER BY stations.dockcount
 
---4. To extract the third longest trip for each rainy day, two CTEs are needed, which can then be joined on date. The first CTE pulls the set of rainy days from the weather table, and the second CTE pulls the third longest trip for each day from the trips table. Finally, the two tables are joined on date, returning the third longest trip for each rainy day. 
+--4. To extract the longest trip for each rainy day, two CTEs are needed, which can then be joined on date. 
+-- The first CTE pulls the set of rainy days from the weather table, and the second CTE pulls the longest trip for each day 
+-- from the trips table. Finally, the two tables are joined on date, returning the longest trip for each rainy day. 
 
 WITH 
 	rainy
@@ -75,28 +87,26 @@ FROM
 	weather
 WHERE 
 	weather.Events like "%Rain%"
-Group by weather.Date
+GROUP BY weather.Date
 ),
-third_longest
+longest
 AS(
 SELECT 
-	trips.duration,
+	max(trips.duration) as longest_trip,
 	trips.trip_id,
 	SUBSTR(trips.start_date, 1, 10) as trip_date
 FROM
 	trips
 GROUP BY trip_date
-ORDER BY duration DESC
-LIMIT -1 OFFSET 3
 )
 SELECT
 	rainy.Date,
 	rainy.Events,
-	third_longest.trip_id,
-	third_longest.trip_date,
-	third_longest.duration
+	longest.trip_id,
+	longest.trip_date,
+	longest.longest_trip
 FROM 
 	rainy
-JOIN third_longest
+JOIN longest
 ON
-    rainy.Date = third_longest.trip_date
+    rainy.Date = longest.trip_date
