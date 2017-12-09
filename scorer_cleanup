@@ -1,0 +1,33 @@
+#Declare custom scorer
+
+def RMSE(y_true,y_pred, verbose=False):
+    rmse = sqrt(mean_squared_error(y_true, y_pred))
+    if verbose==True:
+        print('RMSE: ', rmse)
+        return rmse
+    else:
+        return rmse
+
+def R2(y_true,y_pred, verbose=False):    
+    r2 = r2_score(y_true, y_pred)
+    if verbose==True:
+        print('R2: ', r2)
+        return r2
+    else:
+        return r2
+
+def two_score(y_true,y_pred, verbose=False):    
+    if verbose==True:
+        R2(y_true,y_pred, verbose=True) 
+        score = RMSE(y_true,y_pred, verbose=True)
+        return score
+    else:
+        R2(y_true,y_pred) 
+        score = RMSE(y_true,y_pred)
+        return score
+
+def two_scorer(verbose=False):
+    if verbose==True:
+        return make_scorer(two_score, verbose=True, greater_is_better=False)
+    else:
+        return make_scorer(two_score, greater_is_better=False)
